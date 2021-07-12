@@ -1,0 +1,24 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: 11
+      - name: Build with gradle
+        run: ./gradlew check
+      - name: Publish docker image to Docker Hub
+        env:
+          ORG_GRADLE_PROJECT_docker_user: ${{ secrets.ORG_GRADLE_PROJECT_DOCKER_USER }}
+          ORG_GRADLE_PROJECT_docker_password: ${{ secrets.ORG_GRADLE_PROJECT_DOCKER_PASSWORD }}
+        run: ./gradlew bootBuildImage --publishImage
